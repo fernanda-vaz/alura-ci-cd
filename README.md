@@ -1,69 +1,79 @@
-# React + TypeScript + Vite
+# Estudo de CI/CD: Deploy na Vercel com GitHub Actions
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![Status do Workflow de Deploy](https://github.com/fernanda-vaz/alura-ci-cd/actions/workflows/deploy-vercel.yml/badge.svg)
 
-Currently, two official plugins are available:
+Este projeto é um exercício prático focado em **Integração Contínua e Deploy Contínuo (CI/CD)**. O objetivo foi criar um pipeline automatizado usando **GitHub Actions** para realizar o deploy de uma aplicação simples em **React + Vite + TypeScript** na plataforma **Vercel**.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+O desenvolvimento da aplicação em si foi mínimo, servindo apenas como base para o estudo do processo de automação, inspirado pelos conhecimentos adquiridos no curso **NextJS:** CI e CD para Front-end com Github Actions da plataforma [**Alura**](https://www.alura.com.br/).
 
-## Expanding the ESLint configuration
+## ✨ Tecnologias Utilizadas
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+* **Frontend:** React com Vite e TypeScript
+* **Plataforma de Deploy:** Vercel
+* **Automação (CI/CD):** GitHub Actions
+* **Gerenciador de Pacotes:** NPM
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+---
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+## 🚀 O Pipeline de CI/CD (`deploy-vercel.yml`)
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+O coração deste estudo é o workflow definido no arquivo `.github/workflows/deploy-vercel.yml`. Este pipeline é acionado automaticamente a cada `push` na branch `main` e utiliza a CLI da Vercel para um controle preciso sobre o processo.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+As etapas executadas são:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+1.  **Checkout code**: A Action `actions/checkout@v4` baixa o código do repositório para o ambiente de execução do workflow.
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+2.  **Install Vercel CLI**: Instala a versão mais recente da interface de linha de comando da Vercel, que será usada para os passos seguintes.
+
+3.  **Pull Vercel Environment Information**: O comando `vercel pull` é executado para sincronizar as configurações do projeto Vercel (como `projectId` e `orgId`) e as variáveis de ambiente de produção. Isso garante que o build seja feito com o contexto correto.
+
+4.  **Build Project Artifacts**: O comando `vercel build` é usado para compilar a aplicação. A Vercel CLI é inteligente e detecta que se trata de um projeto React + Vite, executando os comandos de build apropriados (`npm run build`).
+
+5.  **Deploy Project to Vercel**: Por fim, o comando `vercel deploy --prebuilt --prod` faz o upload dos artefatos já compilados na etapa anterior. A flag `--prebuilt` informa à Vercel que não é necessário buildar novamente, e a flag `--prod` promove esta versão diretamente para o ambiente de produção.
+
+### Variáveis de Ambiente (Secrets)
+
+Para que o GitHub Actions pudesse se autenticar e executar os comandos da Vercel, foi necessário configurar os seguintes **Secrets** no repositório do GitHub (em `Settings > Secrets and variables > Actions`):
+
+* `VERCEL_TOKEN`: Token de acesso gerado na conta da Vercel para permitir a autenticação.
+* `VERCEL_ORG_ID`: ID da organização (ou do usuário) na Vercel.
+* `VERCEL_PROJECT_ID`: ID do projeto específico criado na Vercel.
+
+---
+
+## ⚙️ Como Executar o Projeto Localmente
+
+Embora o foco seja o deploy, a aplicação pode ser executada localmente.
+
+### Pré-requisitos
+
+* [Node.js](https://nodejs.org/en/) (versão 18.x ou superior)
+* [NPM](https://www.npmjs.com/) ou [Yarn](https://yarnpkg.com/)
+
+### Passos
+
+1.  Clone o repositório:
+    ```bash
+    git clone [https://github.com/](https://github.com/)fernanda-vaz/alura-ci-cd.git
+    ```
+2.  Navegue até a pasta do projeto:
+    ```bash
+    cd alura-ci-cd
+    ```
+3.  Instale as dependências:
+    ```bash
+    npm install
+    ```
+4.  Inicie o servidor de desenvolvimento:
+    ```bash
+    npm run dev
+    ```
+5.  Abra [http://localhost:5173](http://localhost:5173) no seu navegador.
+
+---
+
+## 🌐 Deploy
+
+O deploy é feito automaticamente. Para ver a versão publicada, acesse:
+
+**[https://ci-cd-rho.vercel.app/](https://ci-cd-rho.vercel.app/)**
