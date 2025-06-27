@@ -1,0 +1,45 @@
+# .github/workflows/deploy-vercel.yml
+
+name: Deploy to Vercel
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout do código: Baixa o código do seu repositório para o ambiente de execução.
+      - name: Checkout code
+        uses: actions/checkout@v4 # Usa a Action oficial 'checkout' na versão 4.
+
+      # 2. Instalação da Vercel CLI: Instala a ferramenta de linha de comando da Vercel.
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      # 3. Pull das Configurações da Vercel: Puxa as configurações do projeto da Vercel
+      #    para garantir que o ambiente de build esteja alinhado com a produção.
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      # 4. Build do Projeto: Executa o comando de build do seu projeto.
+      #    A Vercel CLI é inteligente e usará o comando de build correto (ex: `npm run build`).
+      - name: Build Project Artifacts
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      # 5. Deploy na Vercel: Faz o deploy dos artefatos buildados para a produção.
+      #    A flag '--prod' indica que este é um deploy de produção.
+      - name: Deploy Project to Vercel
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
